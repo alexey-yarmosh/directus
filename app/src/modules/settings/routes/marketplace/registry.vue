@@ -1,12 +1,43 @@
 <script setup lang="ts">
 import SearchInput from '@/views/private/components/search-input.vue';
-import { ref } from 'vue';
+import { ref, watchEffect, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SettingsNavigation from '../../components/navigation.vue';
+import api from '@/api';
+import { debounce } from 'lodash';
 
 const { t } = useI18n();
 
+const liveSearch = ref('');
+
+watch(
+	liveSearch,
+	debounce(() => {
+		search.value = liveSearch.value;
+	}, 450),
+);
+
 const search = ref('');
+const page = ref(0);
+const perPage = ref(20);
+const type = ref<string>();
+
+watch(search, ([newSearch, oldSearch]) => newSearch !== oldSearch && (page.value = 0));
+
+const extensions = ref([]);
+
+watchEffect(async () => {
+	const { data } = await api.get('/extensions/registry', {
+		params: {
+			text: search.value,
+			limit: perPage.value,
+			offset: page.value * perPage.value,
+			type: type.value,
+		},
+	});
+
+	extensions.value = data.data;
+});
 </script>
 
 <template>
@@ -20,7 +51,7 @@ const search = ref('');
 		</template>
 
 		<template #actions>
-			<search-input v-model="search" :show-filter="false" />
+			<search-input v-model="liveSearch" :show-filter="false" />
 		</template>
 
 		<template #navigation>
@@ -32,7 +63,11 @@ const search = ref('');
 		</template>
 
 		<div class="page-container">
-			<h1>Hello World</h1>
+			<ul>
+				<li v-for="extension in extensions" :key="extension.name">
+					{{ extension.name }}
+				</li>
+			</ul>
 		</div>
 	</private-view>
 </template>
