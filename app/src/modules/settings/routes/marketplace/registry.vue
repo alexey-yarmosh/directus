@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import api from '@/api';
+import { formatCollectionItemsCount } from '@/utils/format-collection-items-count';
 import SearchInput from '@/views/private/components/search-input.vue';
-import { ref, watchEffect, watch, computed } from 'vue';
+import { EXTENSION_TYPES } from '@directus/extensions';
+import { debounce } from 'lodash';
+import { computed, ref, watch, watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SettingsNavigation from '../../components/navigation.vue';
-import api from '@/api';
-import { debounce } from 'lodash';
-import { EXTENSION_TYPES } from '@directus/extensions';
 
 const { t } = useI18n();
 
@@ -23,9 +24,14 @@ const search = ref('');
 const page = ref(1);
 const type = ref<string>();
 
-watch(search, ([newSearch, oldSearch]) => newSearch !== oldSearch && (page.value = 0));
+watch(search, ([newSearch, oldSearch]) => newSearch !== oldSearch && (page.value = 1));
 
 const filterCount = ref(0);
+
+const showingCount = computed(() => {
+	return formatCollectionItemsCount(filterCount.value, page.value, perPage, !!search.value);
+});
+
 const extensions = ref([]);
 
 const pageCount = computed(() => Math.round(filterCount.value / perPage));
@@ -56,6 +62,12 @@ watchEffect(async () => {
 		</template>
 
 		<template #actions>
+			<transition name="fade">
+				<span v-if="filterCount" class="item-count">
+					{{ showingCount }}
+				</span>
+			</transition>
+
 			<search-input v-model="liveSearch" :show-filter="false" />
 		</template>
 
@@ -68,8 +80,17 @@ watchEffect(async () => {
 		</template>
 
 		<div class="page-container">
-			<button @click="type = undefined">All</button>
-			<button v-for="extType in EXTENSION_TYPES" :key="extType" @click="type = extType">{{ extType }}</button>
+			<div class="buttons">
+				<button @click="type = undefined">All</button>
+				<button
+					v-for="extType in EXTENSION_TYPES"
+					:key="extType"
+					@click="type = extType"
+					:class="{ active: type === extType }"
+				>
+					{{ extType }}
+				</button>
+			</div>
 
 			<v-list>
 				<v-list-item v-for="extension in extensions" :key="extension.name" block clickable>
@@ -107,5 +128,37 @@ watchEffect(async () => {
 
 .extension-group + .extension-group {
 	margin-top: 24px;
+}
+
+/** @TODO improve by a lot */
+.buttons {
+	display: flex;
+	gap: 1em;
+
+	& .active {
+		color: var(--theme--primary);
+	}
+}
+
+.item-count {
+	position: relative;
+	display: none;
+	margin: 0 8px;
+	color: var(--theme--foreground-subdued);
+	white-space: nowrap;
+
+	@media (min-width: 600px) {
+		display: inline;
+	}
+}
+
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity var(--medium) var(--transition);
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
 }
 </style>
