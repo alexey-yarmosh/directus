@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ExtensionType } from '@directus/extensions';
+import SearchInput from '@/views/private/components/search-input.vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SettingsNavigation from '../../components/navigation.vue';
 
 const { t } = useI18n();
+
+const search = ref('');
 </script>
 
 <template>
@@ -14,6 +17,10 @@ const { t } = useI18n();
 			<v-button class="header-icon" rounded icon exact disabled>
 				<v-icon name="storefront" />
 			</v-button>
+		</template>
+
+		<template #actions>
+			<search-input v-model="search" :show-filter="false" />
 		</template>
 
 		<template #navigation>
