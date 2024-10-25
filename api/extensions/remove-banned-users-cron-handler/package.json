@@ -1,0 +1,51 @@
+{
+	"name": "remove-banned-users-cron-handler",
+	"description": "Handle banned users CRON job. Reads directus users, users not found on github are deleted.",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-custom-operation"
+	],
+	"type": "module",
+	"directus:extension": {
+		"type": "operation",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"source": {
+			"app": "src/app.ts",
+			"api": "src/api.ts"
+		},
+		"host": "^10.3.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"test": "tsc --noEmit && NODE_ENV=test mocha",
+		"test:dev": "NODE_ENV=test TS_NODE_TRANSPILE_ONLY=true mocha"
+	},
+	"devDependencies": {
+		"@directus/extensions": "^1.0.9",
+		"@directus/extensions-sdk": "11.0.9",
+		"@directus/types": "^11.2.0",
+		"@types/chai": "^4.3.17",
+		"@types/mocha": "^10.0.7",
+		"@types/node": "^20.14.13",
+		"@types/sinon": "^17.0.3",
+		"chai": "^5.1.1",
+		"mocha": "^10.7.0",
+		"nock": "^13.5.4",
+		"sinon": "^18.0.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.5.4",
+		"vue": "^3.4.35"
+	},
+	"dependencies": {
+		"axios": "^1.7.3",
+		"bluebird": "^3.7.2"
+	}
+}
