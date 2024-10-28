@@ -1,16 +1,16 @@
-<!-- Checkout to the version of the globalping-dash-directus. -->
+<!-- 1. Checkout to the version of the globalping-dash-directus. -->
 git ch v11.1.1
 
-<!-- Remove prev dependencies. -->
+<!-- 2. Remove prev dependencies. -->
 rm -rf node_modules && rm -rf api/node_modules && rm -rf app/node_modules
 
-<!-- Run in globalping-dash-directus: -->
+<!-- 3. Run in globalping-dash-directus: -->
 <!-- pnpm i && pnpm -r build -->
 
-<!-- Clear the extensions folder. -->
+<!-- 4. Clear the extensions folder. -->
 rm -rf ~/Documents/web/jsd/directus-repo-2/api/extensions/*
 
-<!-- Copy builded dependencies from globalping-dash-directus to directus-repo-2. -->
+<!-- 5. Copy builded dependencies from globalping-dash-directus to directus-repo-2. -->
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/bytes-value/ ~/Documents/web/jsd/directus-repo-2/api/extensions/bytes-value/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/adoption-code/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adoption-code/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/credits-timeline/ ~/Documents/web/jsd/directus-repo-2/api/extensions/credits-timeline/
@@ -33,8 +33,13 @@ rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/gh-webhook-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/gh-webhook-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-banned-users-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-banned-users-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/sponsors-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sponsors-cron-handler/
-<!-- Ignore /extensions/lib folder, it is was already included in required extensions during build. -->
+<!-- Ignore /extensions/lib folder, it was already included in required extensions during build: -->
 <!-- rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/lib/ ~/Documents/web/jsd/directus-repo-2/api/extensions/lib/ -->
 
-<!-- Run only VSCode debug, that is enough to run both BE and FE. -->
-<!-- To edit the .ts files rename /src forlder to /dist. It should be autoupdated and debuggable. -->
+<!-- 6. in package.json rename `dist/*.js` to `src/*.ts`. -->
+
+<!-- 7. From extension folder run `rm -rf node_modules package-lock.json && npm i` -->
+
+<!-- 8. Run `pnpm --filter api dev` to view the logs. Verify that there are no errors. -->
+
+<!-- 9. Run only VSCode debug, that is enough to run both BE and FE. It should be autoupdated and debuggable. -->
