@@ -8,12 +8,17 @@ import endpoint from '../src/index.js';
 describe('adoption code endpoints', () => {
 	const createOne = sinon.stub().resolves('generatedId');
 	const readByQuery = sinon.stub().resolves([]);
+	const orWhere = sinon.stub().resolves([]);
 	const endpointContext = {
 		logger: {
 			error: console.error,
 		},
 		getSchema: () => {},
-		database: {},
+		database: () => ({
+			whereRaw: () => ({
+				orWhere,
+			}),
+		}),
 		env: {
 			GLOBALPING_URL: 'https://api.globalping.io/v1',
 			GP_SYSTEM_KEY: 'system',
@@ -51,6 +56,7 @@ describe('adoption code endpoints', () => {
 	beforeEach(() => {
 		sinon.resetHistory();
 		readByQuery.resolves([]);
+		orWhere.resolves([]);
 	});
 
 	after(() => {
@@ -226,14 +232,14 @@ describe('adoption code endpoints', () => {
 				},
 			};
 
-			readByQuery.resolves([{}]);
+			orWhere.resolves([{}]);
 
 			await request('/send-code', req, res);
 
 			expect(resStatus.callCount).to.equal(1);
 			expect(resStatus.args[0]).to.deep.equal([ 400 ]);
 			expect(resSend.callCount).to.equal(1);
-			expect(resSend.args[0]).to.deep.equal([ 'Probe with that ip is already adopted' ]);
+			expect(resSend.args[0]).to.deep.equal([ 'The probe with this IP address is already adopted' ]);
 		});
 	});
 
@@ -632,7 +638,7 @@ describe('adoption code endpoints', () => {
 			expect(nock.isDone()).to.equal(true);
 			expect(resSend.callCount).to.equal(2);
 			expect(resSend.args[0]).to.deep.equal([ 'Code was sent to the probe.' ]);
-			expect(resSend.args[1]).to.deep.equal([ 'Code is not valid' ]);
+			expect(resSend.args[1]).to.deep.equal([ 'Invalid code' ]);
 			expect(createOne.callCount).to.equal(0);
 		});
 

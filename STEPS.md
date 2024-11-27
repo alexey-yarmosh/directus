@@ -32,9 +32,9 @@ rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/adopted-probes-status-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probes-status-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/gh-webhook-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/gh-webhook-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-banned-users-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-banned-users-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-expired-adoptions-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-expired-adoptions-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/sponsors-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sponsors-cron-handler/
 <!-- Ignore /extensions/lib folder, it was already included in required extensions during build: -->
-<!-- rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/lib/ ~/Documents/web/jsd/directus-repo-2/api/extensions/lib/ -->
 
 <!-- 6. in package.json rename `dist/*.js` to `src/*.ts`. -->
 
@@ -43,3 +43,6 @@ rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations
 <!-- 8. Run `pnpm --filter api dev` to view the logs. Verify that there are no errors. -->
 
 <!-- 9. Run only VSCode debug, that is enough to run both BE and FE. It should be autoupdated and debuggable. -->
+
+<!-- 10. Commit changes and push using: -->
+git push -f alexey-yarmosh HEAD:v11
