@@ -13,7 +13,9 @@ rm -rf ~/Documents/web/jsd/directus-repo-2/api/extensions/*
 <!-- 5. Copy builded dependencies from globalping-dash-directus to directus-repo-2. -->
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/bytes-value/ ~/Documents/web/jsd/directus-repo-2/api/extensions/bytes-value/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/adoption-code/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adoption-code/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/applications/ ~/Documents/web/jsd/directus-repo-2/api/extensions/applications/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/credits-timeline/ ~/Documents/web/jsd/directus-repo-2/api/extensions/credits-timeline/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/metadata/ ~/Documents/web/jsd/directus-repo-2/api/extensions/metadata/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/redirect/ ~/Documents/web/jsd/directus-repo-2/api/extensions/redirect/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/sync-github-data/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sync-github-data/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/adopted-probe/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probe/
@@ -30,6 +32,7 @@ rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/interfaces
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/modules/probes-adapter/ ~/Documents/web/jsd/directus-repo-2/api/extensions/probes-adapter/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/adopted-probes-credits-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probes-credits-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/adopted-probes-status-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probes-status-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/check-outdated-firmware-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/check-outdated-firmware-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/gh-webhook-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/gh-webhook-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-banned-users-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-banned-users-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-expired-adoptions-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-expired-adoptions-cron-handler/
