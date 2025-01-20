@@ -1,6 +1,6 @@
 import type { OperationContext } from '@directus/extensions';
 import Bluebird from 'bluebird';
-import { checkFirmwareVersions } from '../../../../lib/src/check-firmware-versions.js';
+import { checkFirmwareVersions } from '../check-firmware-versions.js';
 import { getAlreadyNotifiedProbes, getProbesToCheck } from '../repositories/directus.js';
 
 export const checkOutdatedFirmware = async (context: OperationContext): Promise<string[]> => {
@@ -22,7 +22,7 @@ export const checkOutdatedFirmware = async (context: OperationContext): Promise<
 			return checkFirmwareVersions(probe, probe.userId, context);
 		}, { concurrency: 4 });
 
-		result.concat(ids.filter((id): id is string => !!id));
+		result.push(...ids.filter((id): id is string => !!id));
 		offsetId = probes.at(-1)?.id || '';
 	} while (offsetId);
 

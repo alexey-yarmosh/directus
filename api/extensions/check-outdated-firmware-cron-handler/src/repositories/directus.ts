@@ -1,5 +1,5 @@
 import type { OperationContext } from '@directus/extensions';
-import { getFirmwareSubject, getNodeVersionSubject } from '../../../../lib/src/check-firmware-versions.js';
+import { getFirmwareSubject, getNodeVersionSubject } from '../check-firmware-versions.js';
 
 export type AdoptedProbe = {
 	id: string;
@@ -19,7 +19,7 @@ export const getAlreadyNotifiedProbes = async ({ env, services, database, getSch
 	});
 
 	const notifications: { item: string }[] = await notificationsService.readByQuery({
-		fields: [ 'id' ],
+		fields: [ 'item' ],
 		filter: {
 			subject: {
 				_in: [ getFirmwareSubject(env.TARGET_HW_DEVICE_FIRMWARE), getNodeVersionSubject(env.TARGET_NODE_VERSION) ],
@@ -33,16 +33,17 @@ export const getAlreadyNotifiedProbes = async ({ env, services, database, getSch
 
 
 export const getProbesToCheck = async (offsetId: string, { env, database }: OperationContext) => {
-	const probes: AdoptedProbe[] = await database.raw(`
-		SELECT *
-		FROM gp_adopted_probes
-		WHERE (
-			(nodeVersion != ? AND nodeVersion IS NOT NULL)
-			OR (hardwareDeviceFirmware != ? AND hardwareDeviceFirmware IS NOT NULL)
-		)
-		AND id > ?
-		LIMIT 100
-	`, [ env.TARGET_NODE_VERSION, env.TARGET_HW_DEVICE_FIRMWARE, offsetId ]);
+	const probes: AdoptedProbe[] = await database('gp_adopted_probes')
+		.select('*')
+		.whereRaw(`
+			(
+				(nodeVersion != ? AND nodeVersion IS NOT NULL)
+				OR (hardwareDeviceFirmware != ? AND hardwareDeviceFirmware IS NOT NULL)
+			)
+			AND id > ?
+		`, [ env.TARGET_NODE_VERSION, env.TARGET_HW_DEVICE_FIRMWARE, offsetId ])
+		.orderBy('id')
+		.limit(100);
 
 	return probes;
 };
