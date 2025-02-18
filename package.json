@@ -4,6 +4,7 @@
 	"homepage": "https://directus.io",
 	"type": "module",
 	"scripts": {
+		"init:dev": "./init.sh",
 		"build": "pnpm --recursive --filter '!docs' run build",
 		"format": "prettier --cache --check .",
 		"lint": "eslint --cache .",
