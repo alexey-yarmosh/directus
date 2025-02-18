@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as sinon from 'sinon';
 import { checkOnlineStatus } from '../src/actions/check-online-status.js';
 
-describe('Adopted probes status cron handler', () => {
+describe('Probes status cron handler', () => {
 	const database = {} as OperationContext['database'];
 	const accountability = {} as OperationContext['accountability'];
 	const logger = console.log as unknown as OperationContext['logger'];
@@ -11,7 +11,6 @@ describe('Adopted probes status cron handler', () => {
 	const env = {
 		GLOBALPING_URL: 'https://api.globalping.io/v1',
 		GP_SYSTEM_KEY: 'system',
-		ADOPTED_PROBES_CHECK_TIME_MAX_DEVIATION_MINS: '5',
 	};
 
 	const data = {};
@@ -48,14 +47,14 @@ describe('Adopted probes status cron handler', () => {
 
 		expect(services.ItemsService.callCount).to.equal(2);
 
-		expect(services.ItemsService.args[0]).deep.equal([ 'gp_adopted_probes', {
+		expect(services.ItemsService.args[0]).deep.equal([ 'gp_probes', {
 			schema: {},
 			knex: {},
 		}]);
 
 		expect(readByQuery.args[0]).to.deep.equal([{}]);
 
-		expect(services.ItemsService.args[1]).to.deep.equal([ 'gp_adopted_probes', {
+		expect(services.ItemsService.args[1]).to.deep.equal([ 'gp_probes', {
 			schema: {},
 			knex: {},
 		}]);
@@ -65,7 +64,7 @@ describe('Adopted probes status cron handler', () => {
 		expect(result).to.deep.equal([ 1 ]);
 	});
 
-	it('should not call "updateBatch" if adopted probe is not connected to gp', async () => {
+	it('should not call "updateBatch" if probe is not connected to gp', async () => {
 		readByQuery.resolves([{
 			id: '1',
 			status: 'offline',
@@ -76,7 +75,7 @@ describe('Adopted probes status cron handler', () => {
 
 		expect(services.ItemsService.callCount).to.equal(1);
 
-		expect(services.ItemsService.args[0]).deep.equal([ 'gp_adopted_probes', {
+		expect(services.ItemsService.args[0]).deep.equal([ 'gp_probes', {
 			schema: {},
 			knex: {},
 		}]);
@@ -99,7 +98,7 @@ describe('Adopted probes status cron handler', () => {
 
 		expect(services.ItemsService.callCount).to.equal(1);
 
-		expect(services.ItemsService.args[0]).deep.equal([ 'gp_adopted_probes', {
+		expect(services.ItemsService.args[0]).deep.equal([ 'gp_probes', {
 			schema: {},
 			knex: {},
 		}]);

@@ -16,12 +16,18 @@ type User = {
 export const getAdoptedProbes = async ({ services, database, getSchema }: OperationContext) => {
 	const { ItemsService } = services;
 
-	const itemsService = new ItemsService('gp_adopted_probes', {
+	const itemsService = new ItemsService('gp_probes', {
 		schema: await getSchema({ database }),
 		knex: database,
 	});
 
-	const result = await itemsService.readByQuery({}) as AdoptedProbe[];
+	const result = await itemsService.readByQuery({
+		filter: {
+			userId: {
+				_nnull: true,
+			},
+		},
+	}) as AdoptedProbe[];
 	return result;
 };
 
@@ -62,7 +68,7 @@ export const addCredits = async (adoptedProbes: AdoptedProbe[], { services, data
 export const resetOnlineTimes = async ({ services, database, getSchema }: OperationContext) => {
 	const { ItemsService } = services;
 
-	const itemsService = new ItemsService('gp_adopted_probes', {
+	const itemsService = new ItemsService('gp_probes', {
 		schema: await getSchema({ database }),
 		knex: database,
 	});
