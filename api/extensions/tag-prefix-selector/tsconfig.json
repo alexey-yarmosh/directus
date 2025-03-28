@@ -1,10 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "ES2019",
-		"lib": [
-			"ES2019",
-			"DOM"
-		],
+		"lib": ["ES2019", "DOM"],
 		"moduleResolution": "node",
 		"strict": true,
 		"noFallthroughCasesInSwitch": true,
@@ -20,16 +17,12 @@
 		"strictFunctionTypes": true,
 		"strictBindCallApply": true,
 		"strictPropertyInitialization": true,
-		"resolveJsonModule": true,
+		"resolveJsonModule": false,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
 		"allowSyntheticDefaultImports": true,
 		"isolatedModules": true,
-		"module": "ESNext"
+		"rootDir": "./src"
 	},
-	"include": [
-		"./src/**/*.ts",
-		"../../lib/*.ts",
-		"./test/**/*.ts"
-	]
+	"include": ["./src/**/*.ts"]
 }

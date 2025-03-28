@@ -8,7 +8,7 @@ import ipaddr from 'ipaddr.js';
 import Joi from 'joi';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { checkFirmwareVersions } from '../../../lib/src/check-firmware-versions.js';
-import { createAdoptedProbe, findAdoptedProbesByIp } from './repositories/directus.js';
+import { createAdoptedProbe, findAdoptedProbeByIp } from './repositories/directus.js';
 
 export type Request = ExpressRequest & {
 	accountability: {
@@ -17,34 +17,17 @@ export type Request = ExpressRequest & {
 	schema: object,
 };
 
-type SendCodeResponse = {
-	uuid: string;
-	version: string;
-	nodeVersion: string;
-	hardwareDevice: string | null;
-	hardwareDeviceFirmware: string | null;
-	status: string;
-	systemTags: string[];
-	city: string;
-	state?: string;
-	country: string;
-	latitude: number;
-	longitude: number;
-	asn: number;
-	network: string;
-}
-
-export type AdoptedProbe = {
+export type ProbeToAdopt = {
 	ip: string;
+	altIps: string[];
 	name: string | null;
-	code: string;
 	uuid: string | null;
 	version: string | null;
 	nodeVersion: string | null;
 	hardwareDevice: string | null;
 	hardwareDeviceFirmware: string | null;
-	status: string;
 	systemTags: string[];
+	status: string;
 	city: string | null;
 	state: string | null;
 	country: string | null;
@@ -52,6 +35,14 @@ export type AdoptedProbe = {
 	longitude: number | null;
 	asn: number | null;
 	network: string | null;
+	isIPv4Supported: boolean;
+	isIPv6Supported: boolean;
+};
+
+export type AdoptedProbe = ProbeToAdopt & {
+	id: string;
+	userId: string;
+	lastSyncDate: Date;
 };
 
 const InvalidCodeError = createError('INVALID_PAYLOAD_ERROR', 'Invalid code', 400);
@@ -62,7 +53,7 @@ const rateLimiter = new RateLimiterMemory({
 	duration: 30 * 60,
 });
 
-const probesToAdopt = new TTLCache<string, AdoptedProbe>({ ttl: 30 * 60 * 1000 });
+const probesToAdopt = new TTLCache<string, { code: string, probe: ProbeToAdopt }>({ ttl: 30 * 60 * 1000 });
 
 const generateRandomCode = () => {
 	const randomNumber = Math.floor(Math.random() * 1000000);
@@ -100,9 +91,9 @@ export default defineEndpoint((router, context) => {
 
 			await rateLimiter.consume(userId, 1).catch(() => { throw new TooManyRequestsError(); });
 
-			const adoptedProbes = await findAdoptedProbesByIp(ip, context as unknown as EndpointExtensionContext);
+			const adoptedProbe = await findAdoptedProbeByIp(ip, context as unknown as EndpointExtensionContext);
 
-			if (adoptedProbes.length > 0) {
+			if (adoptedProbe) {
 				throw new (createError('INVALID_PAYLOAD_ERROR', 'The probe with this IP address is already adopted', 400))();
 			}
 
@@ -110,75 +101,73 @@ export default defineEndpoint((router, context) => {
 
 			// Allowing user to adopt the probe with default values, even if there was no response from GP API.
 			probesToAdopt.set(userId, {
-				ip,
-				name: null,
 				code,
-				uuid: null,
-				version: null,
-				nodeVersion: null,
-				hardwareDevice: null,
-				hardwareDeviceFirmware: null,
-				status: 'offline',
-				systemTags: [],
-				city: null,
-				state: null,
-				country: null,
-				latitude: null,
-				longitude: null,
-				asn: null,
-				network: null,
+				probe: {
+					ip,
+					altIps: [],
+					name: null,
+					uuid: null,
+					version: null,
+					nodeVersion: null,
+					hardwareDevice: null,
+					hardwareDeviceFirmware: null,
+					systemTags: [],
+					status: 'offline',
+					city: null,
+					state: null,
+					country: null,
+					latitude: null,
+					longitude: null,
+					asn: null,
+					network: null,
+					isIPv4Supported: false,
+					isIPv6Supported: false,
+				},
 			});
 
 			if (env.ENABLE_E2E_MOCKS === true) {
 				probesToAdopt.set(userId, {
-					ip,
-					name: null,
 					code: '111111',
-					uuid: '7bac0b3a-f808-48e1-8892-062bab3280f8',
-					version: '0.28.0',
-					nodeVersion: null,
-					hardwareDevice: null,
-					hardwareDeviceFirmware: null,
-					status: 'offline',
-					systemTags: [],
-					city: 'Ouagadougou',
-					state: null,
-					country: 'BF',
-					latitude: 12.37,
-					longitude: -1.53,
-					asn: 3302,
-					network: 'e2e network provider',
+					probe: {
+						ip,
+						altIps: [],
+						name: null,
+						uuid: '7bac0b3a-f808-48e1-8892-062bab3280f8',
+						version: '0.28.0',
+						nodeVersion: null,
+						hardwareDevice: null,
+						hardwareDeviceFirmware: null,
+						systemTags: [],
+						status: 'offline',
+						city: 'Ouagadougou',
+						state: null,
+						country: 'BF',
+						latitude: 12.37,
+						longitude: -1.53,
+						asn: 3302,
+						network: 'e2e network provider',
+						isIPv4Supported: true,
+						isIPv6Supported: false,
+					},
 				});
 
 				res.send('Code was sent to the probe.');
 				return;
 			}
 
-			const { data } = await axios.post<SendCodeResponse>(`${env.GLOBALPING_URL}/adoption-code?systemkey=${env.GP_SYSTEM_KEY}`, {
+			const { data: probe } = await axios.post<ProbeToAdopt>(`${env.GLOBALPING_URL}/adoption-code`, {
 				ip,
 				code,
 			}, {
+				headers: {
+					'X-Api-Key': env.GP_SYSTEM_KEY,
+				},
 				timeout: 5000,
 			});
 
 			probesToAdopt.set(userId, {
-				ip,
-				name: null,
 				code,
-				uuid: data.uuid,
-				version: data.version,
-				nodeVersion: data.nodeVersion,
-				hardwareDevice: data.hardwareDevice || null,
-				hardwareDeviceFirmware: data.hardwareDeviceFirmware || null,
-				status: data.status,
-				systemTags: data.systemTags,
-				city: data.city,
-				state: data.state || null,
-				country: data.country,
-				latitude: data.latitude,
-				longitude: data.longitude,
-				asn: data.asn,
-				network: data.network,
+				probe,
 			});
 
 			res.send('Code was sent to the probe.');
@@ -188,7 +177,7 @@ export default defineEndpoint((router, context) => {
 			if (isDirectusError(error)) {
 				res.status(error.status).send(error.message);
 			} else if (axios.isAxiosError(error)) {
-				const message = error.response?.status === 422 ? 'No suitable probes found' : error.message;
+				const message = error.response?.status === 422 ? 'No matching probes found' : error.message;
 				res.status(400).send(message);
 			} else {
 				res.status(500).send('Internal Server Error');
@@ -218,13 +207,14 @@ export default defineEndpoint((router, context) => {
 
 			await rateLimiter.consume(userId, 1).catch(() => { throw new TooManyRequestsError(); });
 
-			const probe = probesToAdopt.get(userId);
+			const value = probesToAdopt.get(userId);
 
-			if (!probe || probe.code !== userCode) {
+			if (!value || value.code !== userCode) {
 				throw new InvalidCodeError();
 			}
 
-			const [ id, name ] = await createAdoptedProbe(req, probe, context);
+			const probe = value.probe;
+			const [ id, name ] = await createAdoptedProbe(userId, probe, context);
 
 			probesToAdopt.delete(userId);
 			await rateLimiter.delete(userId);
@@ -246,8 +236,8 @@ export default defineEndpoint((router, context) => {
 				nodeVersion: probe.nodeVersion,
 				hardwareDevice: probe.hardwareDevice,
 				hardwareDeviceFirmware: probe.hardwareDeviceFirmware,
-				status: probe.status,
 				systemTags: probe.systemTags,
+				status: probe.status,
 				city: probe.city,
 				state: probe.state,
 				country: probe.country,
@@ -256,13 +246,45 @@ export default defineEndpoint((router, context) => {
 				asn: probe.asn,
 				network: probe.network,
 				lastSyncDate: new Date(),
+				isIPv4Supported: probe.isIPv4Supported,
+				isIPv6Supported: probe.isIPv6Supported,
 			});
 		} catch (error: unknown) {
 			logger.error(error);
 
-			if (isDirectusError<{ collection?: string; field?: string; } | undefined>(error) && error.code === 'RECORD_NOT_UNIQUE' && error.extensions?.field === 'adopted_probes_ip') {
-				res.status(error.status).send('Probe with that ip is already adopted');
-			} else if (isDirectusError(error)) {
+			if (isDirectusError(error)) {
+				res.status(error.status).send(error.message);
+			} else {
+				res.status(500).send('Internal Server Error');
+			}
+		}
+	});
+
+	router.put('/adopt-by-token', async (request, res) => {
+		try {
+			if (request.headers['x-api-key'] !== env.GP_SYSTEM_KEY) {
+				throw new (createError('FORBIDDEN', 'Invalid system token', 403))();
+			}
+
+			const probe = request.body.probe as ProbeToAdopt;
+			const user = request.body.user as { id: string };
+
+			const [ id, name ] = await createAdoptedProbe(user.id, probe, context);
+
+			await checkFirmwareVersions({
+				id,
+				ip: probe.ip,
+				name,
+				hardwareDevice: probe.hardwareDevice,
+				hardwareDeviceFirmware: probe.hardwareDeviceFirmware,
+				nodeVersion: probe.nodeVersion,
+			}, user.id, context);
+
+			res.sendStatus(200);
+		} catch (error: unknown) {
+			logger.error(error);
+
+			if (isDirectusError(error)) {
 				res.status(error.status).send(error.message);
 			} else {
 				res.status(500).send('Internal Server Error');
