@@ -41,7 +41,6 @@ function getPathesToSync (subdirs: string[]): Map<string, string> {
 		...subdirs
 			.filter(subdir => !subdir.includes('extensions/bytes-value') && !subdir.includes('extensions/lib'))
 			.map(subdir => {
-				// const extensionName = subdir.split('/').at(-1);
 				return [subdir, `/Users/baderfall/Documents/web/jsd/directus-repo-2/api/extensions`] as const
 			})
 	]);
@@ -51,14 +50,16 @@ function getPathesToSync (subdirs: string[]): Map<string, string> {
 
 const subdirectories = listDirectSubdirectoriesOfSubdirectories('/Users/baderfall/Documents/web/jsd/globalping-dash-directus/src/extensions');
 const pathesToSync = getPathesToSync(subdirectories);
-console.log('pathesToSync', pathesToSync);
 
 async function syncAll() {
 	for (const [key, value] of pathesToSync) {
 		try {
-			const { stdout, stderr } = await execAsync(`rsync -av ${key} ${value}`);
-			console.log(`Successfully synced ${key} to ${value}`);
-			console.log(stdout);
+			console.log(`Syncing ${key} to ${value}`);
+
+			const { stderr } = await execAsync(`rsync -av ${key} ${value}`, {
+				maxBuffer: 1024 * 1024 * 50
+			});
+
 			if (stderr) console.error(stderr);
 		} catch (error) {
 			console.error(`Error syncing ${key} to ${value}:`, error);
