@@ -1,59 +1,40 @@
-<p align="center"><img alt="Directus Logo" src="https://user-images.githubusercontent.com/522079/158864859-0fbeae62-9d7a-4619-b35e-f8fa5f68e0c8.png"></p>
+# Notes:
+# Interface extensions executed as *.ts files are not working.
 
----
+# Use:
+1. npm run init:dev
+4. In package.json of required extension rename `dist/*.js` to `src/*.ts`.
+5. From extension folder run `rm -rf node_modules package-lock.json && npm i`
+6. Run `pnpm --filter api dev` to view the logs. Verify that there are no errors.
+7. Run only VSCode debug, that is enough to run both BE and FE. It should be autoupdated and debuggable.
+8. Commit changes and push using: `git push -f alexey-yarmosh HEAD:v11`
 
-## 🐰 Introduction
+# If it throws on copy (need to be fixes), use that:
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/bytes-value/ ~/Documents/web/jsd/directus-repo-2/api/extensions/bytes-value/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/adoption-code/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adoption-code/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/applications/ ~/Documents/web/jsd/directus-repo-2/api/extensions/applications/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/credits-timeline/ ~/Documents/web/jsd/directus-repo-2/api/extensions/credits-timeline/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/metadata/ ~/Documents/web/jsd/directus-repo-2/api/extensions/metadata/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/redirect/ ~/Documents/web/jsd/directus-repo-2/api/extensions/redirect/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/endpoints/sync-github-data/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sync-github-data/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/adopted-probe/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probe/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/directus-users/ ~/Documents/web/jsd/directus-repo-2/api/extensions/directus-users/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/gp-tokens/ ~/Documents/web/jsd/directus-repo-2/api/extensions/gp-tokens/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/location-overrides/ ~/Documents/web/jsd/directus-repo-2/api/extensions/location-overrides/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/notifications-format/ ~/Documents/web/jsd/directus-repo-2/api/extensions/notifications-format/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/sign-in/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sign-in/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/hooks/sign-up/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sign-up/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/interfaces/github-username/ ~/Documents/web/jsd/directus-repo-2/api/extensions/github-username/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/interfaces/gp-tags/ ~/Documents/web/jsd/directus-repo-2/api/extensions/gp-tags/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/interfaces/secrets/ ~/Documents/web/jsd/directus-repo-2/api/extensions/secrets/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/interfaces/token/ ~/Documents/web/jsd/directus-repo-2/api/extensions/token/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/interfaces/tag-prefix-selector/ ~/Documents/web/jsd/directus-repo-2/api/extensions/tag-prefix-selector/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/modules/probes-adapter/ ~/Documents/web/jsd/directus-repo-2/api/extensions/probes-adapter/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/adopted-probes-credits-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probes-credits-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/adopted-probes-status-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/adopted-probes-status-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/check-outdated-firmware-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/check-outdated-firmware-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/gh-webhook-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/gh-webhook-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-banned-users-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-banned-users-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-expired-adoptions-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-expired-adoptions-cron-handler/
+rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/sponsors-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sponsors-cron-handler/
 
-Directus is a real-time API and App dashboard for managing SQL database content.
-
-- **Open Source.** No artificial limitations, vendor lock-in, or hidden paywalls.
-- **REST & GraphQL API.** Instantly layers a blazingly fast Node.js API on top of any SQL database.
-- **Manage Pure SQL.** Works with new or existing SQL databases, no migration required.
-- **Choose your Database.** Supports PostgreSQL, MySQL, SQLite, OracleDB, CockroachDB, MariaDB, and MS-SQL.
-- **On-Prem or Cloud.** Run locally, install on-premises, or use our
-  [self-service Cloud service](https://directus.io/pricing).
-- **Completely Extensible.** Built to white-label, it is easy to customize our modular platform.
-- **A Modern Dashboard.** Our no-code Vue.js app is safe and intuitive for non-technical users, no training required.
-
-**[Learn more about Directus](https://directus.io)** • **[Documentation](https://docs.directus.io)**
-
-<br />
-
-## 🚀 Directus Cloud
-
-[Directus Cloud](https://directus.io/pricing) allows you to create projects, hosted by the Directus team, from
-$15/month.
-
-- A self-service dashboard to create and monitor all your projects in one place.
-- Everything you need: Directus, database, storage, auto-scaling, and a global CDN.
-- Select your desired region and provision a new project in ~90 seconds.
-
-**[Create a Directus Cloud Project](https://directus.cloud)**
-
-<br />
-
-## 🤔 Community Help
-
-[The Directus Documentation](https://docs.directus.io) is a great place to start, or explore these other channels:
-
-- [Discord](https://directus.chat) (Questions, Live Discussions)
-- [GitHub Issues](https://github.com/directus/directus/issues) (Report Bugs)
-- [GitHub Discussions](https://github.com/directus/directus/discussions) (Feature Requests)
-- [Twitter](https://twitter.com/directus) (Latest News)
-- [YouTube](https://www.youtube.com/c/DirectusVideos/featured) (Video Tutorials)
-
-<br />
-
-## ❤️ Contributing & Sponsoring
-
-Please read our [Contributing Guide](./contributing.md) before submitting Pull Requests.
-
-All security vulnerabilities should be reported in accordance with our
-[Security Policy](https://docs.directus.io/contributing/introduction/#reporting-security-vulnerabilities).
-
-Directus is a premium open-source ([BSL 1.1](./license)) project, made possible with support from our passionate core
-team, talented contributors, and amazing [GitHub Sponsors](https://github.com/sponsors/directus). Thank you all!!
-
-<br />
-
-© 2004-2024, Monospace, Inc.

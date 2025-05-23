@@ -1,6 +1,10 @@
+/* eslint-disable no-console */
 import * as fs from 'fs';
 import * as path from 'path';
 import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 function listDirectSubdirectoriesOfSubdirectories(dir: string): string[] {
 	const subdirs = fs.readdirSync(dir).filter(file => {
@@ -31,13 +35,13 @@ function getPathesToSync (subdirs: string[]): Map<string, string> {
 			'/Users/baderfall/Documents/web/jsd/directus-repo-2/api/extensions'
 		],
 		[
-			'/Users/baderfall/Documents/web/jsd/globalping-dash-directus/src/lib/src',
+			'/Users/baderfall/Documents/web/jsd/globalping-dash-directus/src/extensions/lib/src',
 			'/Users/baderfall/Documents/web/jsd/directus-repo-2/api/lib'
 		],
 		...subdirs
 			.filter(subdir => !subdir.includes('extensions/bytes-value') && !subdir.includes('extensions/lib'))
 			.map(subdir => {
-				const extensionName = subdir.split('/').at(-1);
+				// const extensionName = subdir.split('/').at(-1);
 				return [subdir, `/Users/baderfall/Documents/web/jsd/directus-repo-2/api/extensions`] as const
 			})
 	]);
@@ -47,16 +51,19 @@ function getPathesToSync (subdirs: string[]): Map<string, string> {
 
 const subdirectories = listDirectSubdirectoriesOfSubdirectories('/Users/baderfall/Documents/web/jsd/globalping-dash-directus/src/extensions');
 const pathesToSync = getPathesToSync(subdirectories);
+console.log('pathesToSync', pathesToSync);
 
-pathesToSync.forEach((value, key) => {
-	exec(`rsync -av ${key} ${value}`, (error, stdout, stderr) => {
-		if (error) {
+async function syncAll() {
+	for (const [key, value] of pathesToSync) {
+		try {
+			const { stdout, stderr } = await execAsync(`rsync -av ${key} ${value}`);
+			console.log(`Successfully synced ${key} to ${value}`);
+			console.log(stdout);
+			if (stderr) console.error(stderr);
+		} catch (error) {
 			console.error(`Error syncing ${key} to ${value}:`, error);
-			return;
 		}
+	}
+}
 
-		console.log(`Successfully synced ${key} to ${value}`);
-		console.log(stdout);
-		console.error(stderr);
-	});
-});
+syncAll();
