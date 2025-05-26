@@ -37,4 +37,3 @@ rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-banned-users-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-banned-users-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/remove-expired-adoptions-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/remove-expired-adoptions-cron-handler/
 rsync -av ~/Documents/web/jsd/globalping-dash-directus/src/extensions/operations/sponsors-cron-handler/ ~/Documents/web/jsd/directus-repo-2/api/extensions/sponsors-cron-handler/
-
