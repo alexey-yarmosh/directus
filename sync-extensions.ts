@@ -35,8 +35,8 @@ function getPathesToSync (subdirs: string[]): Map<string, string> {
 			'/Users/baderfall/Documents/web/jsd/directus-repo-2/api/extensions'
 		],
 		[
-			'/Users/baderfall/Documents/web/jsd/globalping-dash-directus/src/extensions/lib/src',
-			'/Users/baderfall/Documents/web/jsd/directus-repo-2/api/lib'
+			'/Users/baderfall/Documents/web/jsd/globalping-dash-directus/src/extensions/lib',
+			'/Users/baderfall/Documents/web/jsd/directus-repo-2/api'
 		],
 		...subdirs
 			.filter(subdir => !subdir.includes('extensions/bytes-value') && !subdir.includes('extensions/lib'))
