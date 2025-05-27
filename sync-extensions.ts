@@ -56,9 +56,7 @@ async function syncAll() {
 		try {
 			console.log(`Syncing ${key} to ${value}`);
 
-			const { stderr } = await execAsync(`rsync -av ${key} ${value}`, {
-				maxBuffer: 1024 * 1024 * 50
-			});
+			const { stderr } = await execAsync(`ln -sf ${key} ${value}`);
 
 			if (stderr) console.error(stderr);
 		} catch (error) {
