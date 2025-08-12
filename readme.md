@@ -8,5 +8,6 @@
 0.3. remove `--ignore extensions` from api/package.json (is it working?)
 1. `npm run init:dev`
 6. Run `pnpm --filter api dev` to view the logs. Verify that there are no errors.
-7. Run only VSCode debug, that is enough to run both BE and FE. It should be autoupdated and debuggable. (you can try to add --ignore extensions in package.json if it reloads too long)
-8. Commit changes and push using: `git push -f alexey-yarmosh HEAD:v11`
+7. If you want to debug you need to remove symlink to extension and copy the folder.
+8. Run only VSCode debug, that is enough to run both BE and FE. It should be autoupdated and debuggable. (you can try to add --ignore extensions in package.json if it reloads too long)
+9. Commit changes and push using: `git push -f alexey-yarmosh HEAD:v11`
