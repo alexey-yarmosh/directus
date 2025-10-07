@@ -46,7 +46,9 @@ TODO
 /schema.yaml
 /schema.json
 /api/uploads/
-/api/extensions/
+/api/extensions/*
+!/api/extensions/.gitkeep
+/api/lib
 /tests/blackbox/uploads/
 /tests/blackbox/server-log-*
 /tests/blackbox/sequencer-data.json
